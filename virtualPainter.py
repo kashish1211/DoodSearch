@@ -4,10 +4,13 @@ import time
 import os
 import HandTrackingModule as htm
 
+
 folderPath = 'header'
 # myList = os.listdir(folderPath)
 
 header = cv2.imread(f'{folderPath}/topbar.jpg')
+plus = cv2.imread(f'{folderPath}/plus.png')
+minus = cv2.imread(f'{folderPath}/minus.png')
 
 cap = cv2.VideoCapture(0)
 cap.set(3, 1280)
@@ -18,6 +21,23 @@ color = (0,255,0)
 brushThickness = 15
 xp, yp = (0,0)
 imgCanvas = np.zeros((720,1280,3),np.uint8)
+cv2.namedWindow('BGR',cv2.WINDOW_NORMAL)
+cv2.resizeWindow('BGR', 1280,720)
+
+
+
+
+def change_color():
+    print("selected")
+
+
+cv2.createTrackbar("B", "BGR", 0, 255, change_color)
+cv2.createTrackbar("G", "BGR", 0, 255, change_color)
+cv2.createTrackbar("R", "BGR", 0, 255, change_color)
+
+
+
+
 while True:
     success, img = cap.read()
     img = cv2.flip(img, 1)
@@ -77,10 +97,21 @@ while True:
     img = cv2.bitwise_and(img,imgInv)
     img = cv2.bitwise_or(img,imgCanvas)
 
+        
 
-    img[0:137,0:1280] = header
-    # img = cv2.addWeighted(img, 0.5, imgCanvas, 0.5, 0)
-    cv2.imshow('Image',img)    
+    # plus = cv2.resize(plus,(50,50))
+    # minus = cv2.resize(minus,(50,50))
+    # plus = img_as_float(img)
+
+    # img[260:310,1180:1230] = plus
+    # img[410:460,1180:1230] = minus
+    # img[0:137,0:1280] = header
+
+    b = cv2.getTrackbarPos('B','BGR')
+    g = cv2.getTrackbarPos('G','BGR')
+    r = cv2.getTrackbarPos('R','BGR')
+    # finalImg = cv2.hconcat([img,bgr_color])    
+    cv2.imshow('BGR',img )  
     # cv2.imshow('Image canvas',imgCanvas)
 
     key = cv2.waitKey(10)
