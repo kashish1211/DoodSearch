@@ -58,29 +58,29 @@ while True:
             xp,yp = 0,0
 
             cv2.rectangle(img,(x1,y1-25),(x2,y2+25),color,cv2.FILLED)
-            print('selection mode')
-            if y1 < 137:
-                if 88<x1<238:
-                    color = (0,255,0)
-                    brushThickness = 15   
-                elif 326<x1<476:
-                    color = (0,0,255)
-                    brushThickness = 15   
-                elif 564<x1<714:
-                    color = (203,192,255)
-                    brushThickness = 15   
-                elif 802<x1<952:
-                    color = (255,0,0)
-                    brushThickness = 15                   
-                elif 1040<x1<1190:
-                    brushThickness = 30
-                    color = (0,0,0)
-                else:
-                    print("blank")
+            # print('selection mode')
+            # if y1 < 137:
+            #     if 88<x1<238:
+            #         color = (0,255,0)
+            #         brushThickness = 15   
+            #     elif 326<x1<476:
+            #         color = (0,0,255)
+            #         brushThickness = 15   
+            #     elif 564<x1<714:
+            #         color = (203,192,255)
+            #         brushThickness = 15   
+            #     elif 802<x1<952:
+            #         color = (255,0,0)
+            #         brushThickness = 15                   
+            #     elif 1040<x1<1190:
+            #         brushThickness = 30
+            #         color = (0,0,0)
+            #     else:
+            #         print("blank")
 
         if fingers[1] and fingers[2] == False:
             cv2.circle(img, (x1,y1),5,color,cv2.FILLED)
-            print('Drawing mode')
+            # print('Drawing mode')
             if xp == 0 and yp == 0:
                 xp, yp = x1,y1
             
@@ -110,6 +110,7 @@ while True:
     b = cv2.getTrackbarPos('B','BGR')
     g = cv2.getTrackbarPos('G','BGR')
     r = cv2.getTrackbarPos('R','BGR')
+    color = (b,g,r)
     # finalImg = cv2.hconcat([img,bgr_color])    
     cv2.imshow('BGR',img )  
     # cv2.imshow('Image canvas',imgCanvas)
