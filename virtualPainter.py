@@ -7,6 +7,7 @@ import HandTrackingModule as htm
 from tkinter import *
 from PIL import Image, ImageTk
 from tensorflow.keras.models import load_model
+import webbrowser
 
 global flag
 flag = 0
@@ -101,47 +102,99 @@ def open_camera():
     cv2.destroyAllWindows() 
     cv2.VideoCapture(0).release()
 
-open_camera()
+def main():
+    open_camera()
 
-if flag == 1:
-    image = cv2.imread('opencv_frame.png')
-    image = cv2.bitwise_not(image)
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    window_name = 'image'
-    coords = cv2.findNonZero(image) # Find all non-zero points (text)
-    x, y, w, h = cv2.boundingRect(coords) # Find minimum spanning bounding box
-    image = image[y-10:y+h+10, x-10:x+w+10] 
+
+
+    if flag == 1:
+        # https://www.google.com/search?q=
+        image = cv2.imread('opencv_frame.png')
+        image = cv2.bitwise_not(image)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        # window_name = 'image'
+        coords = cv2.findNonZero(image) # Find all non-zero points (text)
+        x, y, w, h = cv2.boundingRect(coords) # Find minimum spanning bounding box
+        image = image[y-10:y+h+10, x-10:x+w+10] 
+        
+        # cv2.imshow(window_name, image)
+        model = load_model('model.h5')
+        new_classes = ['airplane','ambulance','apple','axe','backpack','banana','baseball_bat', 'basket', 'bat', 'bathtub', 
+                'bed','bench', 'bicycle', 'binoculars', 'bird', 'birthday_cake','book', 'bowtie','bridge', 'broom', 'bucket',
+                'bus','butterfly', 'cactus','calculator','camera', 'candle','car', 'carrot', 'cat', 'ceiling_fan', 'cell_phone', 'chair',
+                'clock', 'cloud', 'coffee_cup', 'compass', 'computer', 'cookie','crab','crocodile', 'crown','cup', 'dog','donut', 'door', 'drums', 'duck', 'dumbbell', 'ear','elephant', 'envelope','eye', 'eyeglasses', 'face', 'fence', 'fire_hydrant', 'fireplace',
+                'fish', 'flashlight', 'flower', 'foot', 'fork','giraffe','golf_club', 'grapes','guitar', 'hamburger', 'hammer', 'hand','hat','headphones','helicopter','hockey_stick','hot_air_balloon','hourglass', 'house',
+                'ice_cream','key' ,'knife', 'ladder','leaf','light_bulb','lightning','lipstick','lollipop','matches','mountain',
+                'mushroom', 'octopus','palm_tree','pants','passport', 'peanut','peas', 'pencil','pineapple', 'pizza','potato','purse','radio','rainbow', 'remote_control', 'rhinoceros','scissors','see_saw',
+                'shoe', 'shorts', 'shovel','skateboard','smiley_face', 'snail', 'snowman','spoon','star','strawberry','suitcase', 'sun','sword', 'syringe','telephone', 'television', 'tennis_racquet', 'The_Eiffel_Tower',
+                'tooth', 'toothbrush','traffic_light', 'train', 'tree','t-shirt', 'umbrella','wheel', 'windmill', 'wine_bottle','wristwatch']
+        
+        im = cv2.resize(image,(28,28))
+        # print(im.shape)
+        im = im.reshape(1, 28, 28, 1).astype('float32')
+        im /= 255.0
+        pred = model.predict(im)[0]
+        ind = (-pred).argsort()[:5]
+        latex = [new_classes[x] for x in ind]
+        print(latex)
+        cv2.imwrite('final_img.png', image)
+
+        #waits for user to press any key 
+        #(this is necessary to avoid Python kernel form crashing)
+        cv2.waitKey(0) 
+
+        #closing all open windows 
+        cv2.destroyAllWindows() 
+
+        def go_to_google(i):
+            name = latex[i]
+            name = name.replace('_','%20')
+            webbrowser.open(f'https://www.google.com/search?q={name}')
+        # creating main tkinter window/toplevel
+        master = Tk()
+        
+        # this will create a label widget
+        for i in range(5):
+            name = latex[i]
+            name = name.replace('_',' ')
+            name = name.capitalize()
+            L = Label(master, text = name)
+            L.grid(row = i, column = 0, sticky = W, pady = 5, padx=5)
+            B = Button(master, text='Click here', command = lambda i=i: go_to_google(i))
+            B.grid(row = i, column = 1, padx = 2, pady = 5)
+
+        
+
+
     
-    cv2.imshow(window_name, image)
-    model = load_model('model.h5')
-    new_classes = ['airplane','ambulance','apple','axe','backpack','banana','baseball_bat', 'basket', 'bat', 'bathtub', 
-               'bed','bench', 'bicycle', 'binoculars', 'bird', 'birthday_cake','book', 'bowtie','bridge', 'broom', 'bucket',
-               'bus','butterfly', 'cactus','calculator','camera', 'candle','car', 'carrot', 'cat', 'ceiling_fan', 'cell_phone', 'chair',
-               'clock', 'cloud', 'coffee_cup', 'compass', 'computer', 'cookie','crab','crocodile', 'crown','cup', 'dog','donut', 'door', 'drums', 'duck', 'dumbbell', 'ear','elephant', 'envelope','eye', 'eyeglasses', 'face', 'fence', 'fire_hydrant', 'fireplace',
-              'fish', 'flashlight', 'flower', 'foot', 'fork','giraffe','golf_club', 'grapes','guitar', 'hamburger', 'hammer', 'hand','hat','headphones','helicopter','hockey_stick','hot_air_balloon','hourglass', 'house',
-              'ice_cream','key' ,'knife', 'ladder','leaf','light_bulb','lightning','lipstick','lollipop','matches','mountain',
-              'mushroom', 'octopus','palm_tree','pants','passport', 'peanut','peas', 'pencil','pineapple', 'pizza','potato','purse','radio','rainbow', 'remote_control', 'rhinoceros','scissors','see_saw',
-              'shoe', 'shorts', 'shovel','skateboard','smiley_face', 'snail', 'snowman','spoon','star','strawberry','suitcase', 'sun','sword', 'syringe','telephone', 'television', 'tennis_racquet', 'The_Eiffel_Tower',
-              'tooth', 'toothbrush','traffic_light', 'train', 'tree','t-shirt', 'umbrella','wheel', 'windmill', 'wine_bottle','wristwatch']
-    im = cv2.resize(image,(28,28))
-    print(im.shape)
-    im = im.reshape(1, 28, 28, 1).astype('float32')
-    im /= 255.0
-    pred = model.predict(im)[0]
-    ind = (-pred).argsort()[:5]
-    latex = [new_classes[x] for x in ind]
-    print(latex)
 
-    #waits for user to press any key 
-    #(this is necessary to avoid Python kernel form crashing)
-    cv2.waitKey(0) 
+        image = cv2.resize(image,(256,256))
+        im = Image.fromarray(image)
+        
+        # adding image (remember image should be PNG and not JPG)
+        imgtk = ImageTk.PhotoImage(image=im)
+        
+        # img1 = img.subsample(2, 2)
+        
+        # setting image with the help of label
+        Label(master, image = imgtk).grid(row = 0, column = 2,
+            columnspan = 2, rowspan = 4, padx = 5, pady = 5)
+        
+        def new_drawing():
+            master.destroy()
+            main()
+        def end():
+            exit()
+        # button widget
+        b1 = Button(master, text = "Draw again.", command=new_drawing)
+        b2 = Button(master, text = "Exit", command=end)
+        
+        # arranging button widgets
+        b1.grid(row = 4, column = 2, sticky = E)
+        b2.grid(row = 4, column = 3, sticky = E)
+        
+        # infinite loop which can be terminated
+        # by keyboard or mouse interrupt
+        mainloop()
 
-    #closing all open windows 
-    cv2.destroyAllWindows() 
-    # win= Tk()
-    # win.geometry("700x350")
-    # im = Image.fromarray(image)
-    # imgtk = ImageTk.PhotoImage(image=im)
-
-    # Label(win, image= imgtk).pack()
-    # win.mainloop()
+main()
