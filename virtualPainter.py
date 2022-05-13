@@ -1,4 +1,6 @@
 from sys import flags
+
+import fontTools
 import cv2
 import numpy as np
 import time
@@ -68,7 +70,6 @@ def open_camera():
                 
 
             elif sum(fingers) == 5:
-                # print('Capture image')
                 img_name = "opencv_frame.png"    
                 imgGray = cv2.cvtColor(imgCanvas,cv2.COLOR_BGR2GRAY)
                 _, imgInv = cv2.threshold(imgGray,50,255,cv2.THRESH_BINARY_INV)
@@ -76,7 +77,6 @@ def open_camera():
                 cv2.imwrite(img_name, imgInv)
                 global flag
                 flag = 1
-                # time.sleep(5)
                 break
             
             else:
@@ -150,48 +150,51 @@ def main():
             name = latex[i]
             name = name.replace('_','%20')
             webbrowser.open(f'https://www.google.com/search?q={name}')
-        # creating main tkinter window/toplevel
+      
         master = Tk()
+        master.geometry('580x600')
+        master.configure(bg="#E8F9FD")
+
+        image = cv2.resize(image,(400,400))
+        im = Image.fromarray(image)
+
+         # adding image (remember image should be PNG and not JPG)
+        imgtk = ImageTk.PhotoImage(image=im)
         
-        # this will create a label widget
+        # img1 = img.subsample(2, 2)
+        
+        # setting image with the help of label
+        Label(master, image = imgtk).grid(row = 0, column = 0,
+            rowspan = 2, columnspan = 5, padx = 90, pady = 25)
+        
+        
         for i in range(5):
             name = latex[i]
             name = name.replace('_',' ')
             name = name.capitalize()
-            L = Label(master, text = name)
-            L.grid(row = i, column = 0, sticky = W, pady = 5, padx=5)
-            B = Button(master, text='Click here', command = lambda i=i: go_to_google(i))
-            B.grid(row = i, column = 1, padx = 2, pady = 5)
+            B = Button(master ,text=name, font='Helvetica 10 bold',height=2, width=12, command = lambda i=i: go_to_google(i), bg="#79DAE8")
+            B.grid(row = 2, column = i, padx = 1, pady = 2)
 
         
 
 
     
 
-        image = cv2.resize(image,(256,256))
-        im = Image.fromarray(image)
         
-        # adding image (remember image should be PNG and not JPG)
-        imgtk = ImageTk.PhotoImage(image=im)
         
-        # img1 = img.subsample(2, 2)
-        
-        # setting image with the help of label
-        Label(master, image = imgtk).grid(row = 0, column = 2,
-            columnspan = 2, rowspan = 4, padx = 5, pady = 5)
-        
+       
         def new_drawing():
             master.destroy()
             main()
         def end():
             exit()
         # button widget
-        b1 = Button(master, text = "Draw again.", command=new_drawing)
-        b2 = Button(master, text = "Exit", command=end)
+        b1 = Button(master, text = "Draw again", font='Helvetica 10 bold',height=2, width=12,command=new_drawing, bg="#79DAE8")
+        b2 = Button(master, text = "Exit",font='Helvetica 10 bold', height=2, width=12,command=end, bg="#79DAE8")
         
         # arranging button widgets
-        b1.grid(row = 4, column = 2, sticky = E)
-        b2.grid(row = 4, column = 3, sticky = E)
+        b1.grid(row = 3, column = 1, padx = 1, pady = 2)
+        b2.grid(row = 3, column = 3, padx = 1, pady = 2)
         
         # infinite loop which can be terminated
         # by keyboard or mouse interrupt
